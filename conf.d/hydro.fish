@@ -33,14 +33,9 @@ end
 
 function _hydro_postexec --on-event fish_postexec
     set --local last_status $pipestatus
-    set --global _hydro_status "$_hydro_newline$_hydro_color_prompt$hydro_symbol_prompt"
-
-    for code in $last_status
-        if test $code -ne 0
-            set --global _hydro_status "$_hydro_color_error| "(echo $last_status)" $_hydro_newline$_hydro_color_prompt$_hydro_color_error$hydro_symbol_prompt"
-            break
-        end
-    end
+    set -lx __fish_last_status $status # Export for __fish_print_pipestatus.
+    set --local prompt_status (__fish_print_pipestatus "| " " " " " "$_hydro_color_error" "" $last_status)
+    set --global _hydro_status "$prompt_status$_hydro_newline$_hydro_color_prompt$hydro_symbol_prompt"
 
     test "$CMD_DURATION" -lt $hydro_cmd_duration_threshold && set _hydro_cmd_duration && return
 
